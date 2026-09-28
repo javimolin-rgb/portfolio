@@ -1,0 +1,116 @@
+---
+/* Una pieza: imagen responsiva (AVIF/WebP) o loop de video con póster y pausa.
+   Las piezas nunca se recortan; las fotos pueden recortarse con `cover`. */
+import { Picture, getImage } from 'astro:assets';
+import type { Piece } from '../data/projects';
+import { asset, url } from '../lib/assets';
+
+interface Props {
+  piece: Piece;
+  sizes?: string;
+  eager?: boolean;
+  fit?: 'contain' | 'cover';
+  caption?: boolean;
+  class?: string;
+  style?: string;
+  widths?: number[];
+}
+const { piece, sizes = '(min-width: 1200px) 50vw, 100vw', eager = false, fit = 'contain', caption = true, class: cls = '', style = '', widths } = Astro.props;
+const img = asset(piece.ref);
+const ratio = img.width / img.height;
+const alt = piece.alt ?? (piece.format ? `${piece.name}, ${piece.format}` : piece.name);
+const allWidths = (widths ?? [400, 800, 1200, 1800, 2400]).filter((w) => w <= img.width);
+if (!allWidths.length) allWidths.push(img.width);
+const poster = piece.video ? await getImage({ src: img, width: Math.min(1280, img.width), format: 'webp' }) : null;
+const pos = piece.focus ?? '50% 50%';
+---
+<figure class:list={['fig', cls, { 'fig--round': piece.round, 'fig--cover': fit === 'cover' }]} style={`--r:${ratio.toFixed(4)};${style}`}>
+  <div class="fig__media">
+    {piece.video ? (
+      <video
+        class="fig__el"
+        src={url(`video/${piece.video}.mp4`)}
+        poster={poster!.src}
+        width={img.width}
+        height={img.height}
+        muted
+        loop
+        playsinline
+        preload="none"
+        data-autoplay
+        aria-label={alt}
+      />
+    ) : (
+      <Picture
+        class="fig__el"
+        src={img}
+        alt={alt}
+        widths={allWidths}
+        sizes={sizes}
+        formats={['avif']}
+        fallbackFormat="webp"
+        loading={eager ? 'eager' : 'lazy'}
+        fetchpriority={eager ? 'high' : undefined}
+        decoding="async"
+        style={fit === 'cover' ? `object-position:${pos}` : undefined}
+      />
+    )}
+    {piece.video && (
+      <button class="fig__toggle" type="button" data-video-toggle aria-pressed="false">
+        <span class="sr-only">Pausar video</span>
+        <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><rect class="i-pause" x="5" y="4" width="3.2" height="12" /><rect class="i-pause" x="11.8" y="4" width="3.2" height="12" /><path class="i-play" d="M6 4l10 6-10 6z" /></svg>
+      </button>
+    )}
+  </div>
+  {caption && (
+    <figcaption class="cap"><b>{piece.name}</b>{piece.format && <span>{piece.format}</span>}</figcaption>
+  )}
+</figure>
+
+<style>
+  .fig { min-width: 0; }
+  .fig__media { position: relative; aspect-ratio: var(--r); }
+  .fig__el, .fig__media :global(img) { width: 100%; height: 100%; object-fit: contain; }
+  .fig--cover .fig__media :global(img), .fig--cover .fig__el { object-fit: cover; }
+  .fig--round .fig__media { border-radius: 50%; overflow: hidden; }
+  .fig__toggle {
+    position: absolute; right: var(--s-3); bottom: var(--s-3);
+    width: 2.75rem; height: 2.75rem; display: grid; place-items: center;
+    background: rgb(16 16 16 / 0.72); color: #fff; border-radius: 50%;
+    transition: background-color 160ms ease;
+  }
+  .fig__toggle:hover { background: rgb(16 16 16 / 0.9); }
+  .fig__toggle svg { fill: currentColor; }
+  .fig__toggle .i-play { display: none; }
+  .fig__toggle[aria-pressed='true'] .i-pause { display: none; }
+  .fig__toggle[aria-pressed='true'] .i-play { display: block; }
+</style>
+
+<script>
+  // Loops sin sonido: se reproducen solo cuando están a la vista y si el usuario no pidió menos movimiento.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const v = e.target as HTMLVideoElement;
+      if (v.dataset.paused === 'user') continue;
+      if (e.isIntersecting && !reduce) { v.play().catch(() => {}); } else { v.pause(); }
+    }
+  }, { threshold: 0.35 });
+  document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]').forEach((v) => {
+    io.observe(v);
+    const btn = v.parentElement?.querySelector<HTMLButtonElement>('[data-video-toggle]');
+    if (!btn) return;
+    const label = btn.querySelector('.sr-only')!;
+    const sync = () => {
+      const paused = v.paused;
+      btn.setAttribute('aria-pressed', String(paused));
+      label.textContent = paused ? 'Reproducir video' : 'Pausar video';
+    };
+    v.addEventListener('play', sync); v.addEventListener('pause', sync);
+    if (reduce) sync();
+    btn.addEventListener('click', () => {
+      if (v.paused) { v.dataset.paused = ''; v.play().catch(() => {}); }
+      else { v.dataset.paused = 'user'; v.pause(); }
+    });
+  });
+</script>

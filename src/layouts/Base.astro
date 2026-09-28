@@ -1,0 +1,134 @@
+---
+import '../styles/global.css';
+import anybodyLatin from '../fonts/anybody-latin.woff2?url';
+import { url } from '../lib/assets';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  /** Colores de la página (campo del proyecto). */
+  bg?: string;
+  fg?: string;
+  current?: 'inicio' | 'trabajo' | 'sobre';
+  /** El teléfono solo aparece en Sobre mí. */
+  phone?: boolean;
+}
+const { title, description, ogImage, bg, fg, current, phone = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const og = ogImage ? new URL(ogImage, Astro.site).href : new URL(url('og.jpg'), Astro.site).href;
+const pageStyle = bg ? `--bg:${bg};--fg:${fg};--fg-2:${fg};` : '';
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'María Javiera Molin',
+  alternateName: ['Javi Molin', 'Javiera Molin'],
+  jobTitle: 'Diseñadora Integral',
+  alumniOf: 'Pontificia Universidad Católica de Chile',
+  address: { '@type': 'PostalAddress', addressLocality: 'Santiago', addressCountry: 'CL' },
+  email: 'mailto:javimolin@gmail.com',
+  url: new URL(url(''), Astro.site).href,
+  sameAs: ['https://www.linkedin.com/in/javimolin/'],
+};
+---
+<!doctype html>
+<html lang="es-CL" style={pageStyle}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" href={url('sitemap-index.xml')} />
+    <link rel="preload" href={anybodyLatin} as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content={bg ?? '#eaeae6'} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:site_name" content="Javi Molin" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="author" content="María Javiera Molin" />
+    <script type="application/ld+json" set:html={JSON.stringify(person)} />
+  </head>
+  <body>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+    <header class="bar wrap">
+      <a class="bar__name" href={url('')} aria-current={current === 'inicio' ? 'page' : undefined}>Javi Molin</a>
+      <nav aria-label="Principal">
+        <ul>
+          <li><a href={url('#trabajo')} aria-current={current === 'trabajo' ? 'page' : undefined}>Trabajo</a></li>
+          <li><a href={url('sobre-mi/')} aria-current={current === 'sobre' ? 'page' : undefined}>Sobre mí</a></li>
+          <li><a href={url('#contacto')}>Contacto</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main id="contenido">
+      <slot />
+    </main>
+    <footer class="foot wrap" id="contacto">
+      <p class="foot__lead">¿Un proyecto, un rol, una idea?</p>
+      <a class="foot__mail display" href="mailto:javimolin@gmail.com">javimolin@gmail.com</a>
+      <ul class="foot__links">
+        <li><a href="https://www.linkedin.com/in/javimolin/" rel="me">LinkedIn</a></li>
+        {phone && <li><a href="tel:+56966303974">+56 9 6630 3974</a></li>}
+        <li><a href={url('cv/CV-Javi-Molin.pdf')} download>CV en PDF</a></li>
+        <li>Santiago, Chile</li>
+      </ul>
+      <p class="foot__legal small">María Javiera Molin, Diseñadora Integral UC. Las fotos de modelos y producto son material de las marcas; el diseño, la composición y los originales son míos, salvo donde se indica otra autoría.</p>
+    </footer>
+    <script>
+      // Títulos con ancho extremo: si una línea no cabe en su columna, el título se achica lo justo.
+      const fitAll = () => {
+        document.querySelectorAll<HTMLElement>('[data-fit]').forEach((el) => {
+          el.style.removeProperty('--k');
+          const box = el.parentElement!;
+          const cs = getComputedStyle(box);
+          const w = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+          const over = el.scrollWidth / w;
+          if (over > 1) el.style.setProperty('--k', String(0.985 / over));
+        });
+      };
+      document.fonts.ready.then(fitAll);
+      let t: number | undefined;
+      window.addEventListener('resize', () => { window.clearTimeout(t); t = window.setTimeout(fitAll, 150); });
+    </script>
+  </body>
+</html>
+
+<style>
+  .bar {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; justify-content: space-between; align-items: center; gap: var(--s-4);
+    min-height: 3.5rem; padding-block: var(--s-3);
+    background: var(--bg); color: var(--fg);
+    transition: background-color 360ms ease, color 360ms ease;
+  }
+  .bar a { text-decoration: none; }
+  .bar a:hover, .bar a[aria-current='page'] { text-decoration: underline; text-decoration-thickness: 2px; }
+  .bar__name { font-family: var(--display); font-weight: 760; font-stretch: 125%; font-size: 1.0625rem; letter-spacing: -0.01em; view-transition-name: sitename; }
+  .bar ul { display: flex; gap: clamp(1rem, 2.4vw, 2rem); font-weight: 560; }
+  .bar li a { display: inline-block; padding-block: var(--s-2); }
+
+  .foot { padding-top: var(--section); padding-bottom: var(--s-7); background: var(--bg); color: var(--fg); }
+  .foot__lead { font-size: var(--t-lead); font-weight: 450; }
+  .foot__mail {
+    display: inline-block; margin-top: var(--s-4);
+    font-size: min(8.5rem, 6.9vw); --stretch: 118%; white-space: nowrap;
+    text-decoration-thickness: 0.06em; text-underline-offset: 0.12em;
+    overflow-wrap: anywhere;
+  }
+  .foot__mail:hover { text-decoration-thickness: 0.1em; }
+  .foot__links { display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-6); margin-top: var(--s-7); font-weight: 560; }
+  .foot__links li { padding-block: var(--s-2); }
+  .foot__legal { margin-top: var(--s-6); max-width: 70ch; color: var(--fg-2); }
+
+  @media (max-width: 520px) {
+    .foot__mail { --stretch: 62%; font-size: 12.4vw; }
+    .bar ul { gap: 0.9rem; font-size: 0.9375rem; }
+    .bar__name { font-stretch: 100%; font-size: 0.9375rem; }
+  }
+</style>

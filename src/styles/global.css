@@ -1,0 +1,148 @@
+/* Tokens y base. Ver DESIGN.md para el porqué de cada valor. */
+
+@font-face {
+  font-family: 'Anybody';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  font-stretch: 50% 150%;
+  src: url('../fonts/anybody-latin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Anybody';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  font-stretch: 50% 150%;
+  src: url('../fonts/anybody-latin-ext.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Mona Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+  src: url('../fonts/mona-sans-latin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Mona Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+  src: url('../fonts/mona-sans-latin-ext.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  --ground: #eaeae6;
+  --ink: #101010;
+  --ink-2: #56564f;
+  --rule: rgb(16 16 16 / 0.16);
+  --dark: #141414;
+  --dark-ink: #f2f2ee;
+
+  /* Superficie vigente: la cambian los proyectos y el índice. */
+  --bg: var(--ground);
+  --fg: var(--ink);
+  --fg-2: var(--ink-2);
+
+  --display: 'Anybody', 'Arial Narrow', sans-serif;
+  --text: 'Mona Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --t-name: clamp(4.5rem, 14.5vw, 15rem);
+  --t-display: clamp(3.25rem, 9.6vw, 10rem);
+  --t-index: clamp(2.25rem, 6.4vw, 6rem);
+  --t-h2: clamp(1.75rem, 3.4vw, 3rem);
+  --t-h3: clamp(1.25rem, 1.9vw, 1.625rem);
+  --t-lead: clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem);
+  --t-body: 1.0625rem;
+  --t-small: 0.875rem;
+
+  --margin: clamp(1rem, 4vw, 3.5rem);
+  --gap: clamp(1rem, 2vw, 1.5rem);
+  --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem;
+  --s-7: 3rem; --s-8: 4rem; --s-9: 6rem; --s-10: 8rem; --s-11: 12rem;
+  --section: clamp(4rem, 9vw, 9rem);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  color-scheme: light;
+}
+
+@view-transition { navigation: auto; }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 5rem; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--text);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  font-weight: 400;
+  font-stretch: 100%;
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 360ms ease, color 360ms ease;
+}
+img, video, svg { display: block; max-width: 100%; }
+img { height: auto; }
+figure { margin: 0; }
+h1, h2, h3, p, ul, ol, dl, dd { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+
+::selection { background: var(--fg); color: var(--bg); }
+
+a { color: inherit; text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; transition: text-decoration-thickness 160ms ease; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+.skip {
+  position: absolute; left: var(--margin); top: -4rem; z-index: 50;
+  background: var(--fg); color: var(--bg); padding: var(--s-3) var(--s-4); text-decoration: none;
+}
+.skip:focus { top: var(--s-3); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+.wrap { padding-inline: var(--margin); }
+
+/* Tipografía display: el ancho viene de --stretch (50–150 %). */
+.display {
+  font-family: var(--display);
+  font-weight: 780;
+  font-stretch: var(--stretch, 100%);
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  text-wrap: balance;
+}
+.h2 { font-family: var(--display); font-weight: 720; font-stretch: 100%; font-size: var(--t-h2); line-height: 1; letter-spacing: -0.015em; text-wrap: balance; }
+.h3 { font-family: var(--display); font-weight: 700; font-stretch: 100%; font-size: var(--t-h3); line-height: 1.08; }
+.lead { font-size: var(--t-lead); line-height: 1.4; font-weight: 450; max-width: 34ch; text-wrap: pretty; }
+.prose { max-width: 62ch; text-wrap: pretty; }
+.prose p + p { margin-top: var(--s-4); }
+.small { font-size: var(--t-small); line-height: 1.4; }
+.muted { color: var(--fg-2); }
+
+/* Rótulo de pieza: nombre + formato, sin monoespaciada. */
+.cap { display: block; font-size: var(--t-small); line-height: 1.35; margin-top: var(--s-3); max-width: 40ch; }
+.cap b { display: block; font-weight: 620; }
+.cap span { display: block; color: var(--fg-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* Superficies de un caso. El artículo define --p-field, --p-ink, --p-alt-bg, --p-alt-ink. */
+.s-field { --bg: var(--p-field); --fg: var(--p-ink); --fg-2: var(--p-ink); --rule: color-mix(in srgb, var(--p-ink) 26%, transparent); }
+.s-ground { --bg: var(--ground); --fg: var(--ink); --fg-2: var(--ink-2); --rule: rgb(16 16 16 / 0.16); }
+.s-dark { --bg: var(--dark); --fg: var(--dark-ink); --fg-2: #b9b9b2; --rule: rgb(242 242 238 / 0.2); }
+.s-alt { --bg: var(--p-alt-bg); --fg: var(--p-alt-ink); --fg-2: var(--p-alt-ink); --rule: color-mix(in srgb, var(--p-alt-ink) 26%, transparent); }

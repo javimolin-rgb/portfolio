@@ -1,0 +1,311 @@
+---
+/* Biblioteca de bloques de un caso (DESIGN.md §8). Cada bloque declara su superficie. */
+import Figure from './Figure.astro';
+import ScaleRow from './ScaleRow.astro';
+import type { Block, Piece } from '../data/projects';
+import { ratioOf } from '../lib/assets';
+
+interface Props { blocks: Block[] }
+const { blocks } = Astro.props;
+
+const rowMax = { s: 300, m: 460, l: 640 } as const;
+const ratio = (p: Piece) => ratioOf(p.ref);
+const sumR = (ps: Piece[]) => ps.reduce((a, p) => a + ratio(p), 0);
+const surf = (b: Block) => ('surface' in b && b.surface ? b.surface : 'field');
+const sizesFor = (share: number) => `(min-width: 1100px) ${Math.max(18, Math.round(share * 92))}vw, ${Math.round(Math.min(100, share * 200))}vw`;
+---
+{blocks.map((b, bi) => {
+  const surface = surf(b);
+  const cont = bi > 0 && surf(blocks[bi - 1]) === surface && blocks[bi - 1].kind !== 'bleed';
+  const cls = `blk blk--${b.kind} s-${surface}${cont ? ' is-cont' : ''}`;
+
+  if (b.kind === 'notes') return (
+    <section class={cls} aria-label="Contexto y decisiones">
+      <div class="wrap notes">
+        <div class="notes__ctx prose">{b.text.map((t) => <p class="lead-ish">{t}</p>)}</div>
+        {b.decisions && (
+          <div class="notes__dec">
+            <h2 class="h3">Decisiones</h2>
+            <ul>{b.decisions.map((d) => <li>{d}</li>)}</ul>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+
+  if (b.kind === 'swatches') return (
+    <section class={cls} aria-labelledby={`b${bi}`}>
+      <div class="wrap sw__head">
+        <h2 id={`b${bi}`} class="h2">{b.heading}</h2>
+        {b.piece && <div class="sw__piece"><Figure piece={b.piece} sizes={sizesFor(0.4)} /></div>}
+      </div>
+      <ul class="sw__row">
+        {b.colors.map((c) => (
+          <li style={`background:${c.hex};color:${c.ink}`}><b>{c.hex}</b><span>{c.name}</span></li>
+        ))}
+      </ul>
+    </section>
+  );
+
+  if (b.kind === 'bleed') return (
+    <section class={cls}>
+      <Figure piece={b.piece} sizes="100vw" fit="cover" class="bleed__fig" caption={false} />
+      <p class="cap wrap"><b>{b.piece.name}</b>{b.piece.format && <span>{b.piece.format}</span>}</p>
+    </section>
+  );
+
+  if (b.kind === 'piece') return (
+    <section class={cls}>
+      <div class="wrap piece"><Figure piece={b.piece} sizes={sizesFor(0.6)} /></div>
+    </section>
+  );
+
+  if (b.kind === 'row') {
+    const s = sumR(b.pieces);
+    const max = rowMax[b.size ?? 'm'];
+    const gaps = (b.pieces.length - 1) * 24;
+    return (
+      <section class={cls} aria-labelledby={b.heading ? `b${bi}` : undefined}>
+        <div class="wrap">
+          {b.heading && <h2 id={`b${bi}`} class="h2 blk__h">{b.heading}</h2>}
+          <ul class="jrow" style={`--rowmax:${Math.round(max * s + gaps)}px;--rowh:${max}px`} tabindex="0" aria-label={b.heading ?? 'Piezas'}>
+            {b.pieces.map((p) => (
+              <li class="jrow__item" style={`--ir:${ratio(p).toFixed(4)}`}>
+                <Figure piece={p} sizes={sizesFor(ratio(p) / s)} />
+              </li>
+            ))}
+          </ul>
+          {b.note && <p class="blk__note prose">{b.note}</p>}
+        </div>
+      </section>
+    );
+  }
+
+  if (b.kind === 'grid') return (
+    <section class={cls} aria-labelledby={b.heading ? `b${bi}` : undefined}>
+      <div class="wrap">
+        {b.heading && <h2 id={`b${bi}`} class="h2 blk__h">{b.heading}</h2>}
+        <ul class={`grid grid--${b.cols}`}>
+          {b.pieces.map((p) => <li><Figure piece={p} sizes={sizesFor(1 / b.cols)} /></li>)}
+        </ul>
+        {b.note && <p class="blk__note prose">{b.note}</p>}
+      </div>
+    </section>
+  );
+
+  if (b.kind === 'stack') return (
+    <section class={cls} aria-labelledby={b.heading ? `b${bi}` : undefined}>
+      <div class="wrap">
+        {b.heading && <h2 id={`b${bi}`} class="h2 blk__h">{b.heading}</h2>}
+        <ul class="stack">{b.pieces.map((p) => <li><Figure piece={p} sizes="(min-width: 1100px) 92vw, 100vw" /></li>)}</ul>
+        {b.note && <p class="blk__note prose">{b.note}</p>}
+      </div>
+    </section>
+  );
+
+  if (b.kind === 'scale') return (
+    <section class={cls} aria-labelledby={`b${bi}`}>
+      <div class="wrap">
+        <h2 id={`b${bi}`} class="h2 blk__h">{b.heading}</h2>
+        <ScaleRow pieces={b.pieces.map((piece) => ({ piece }))} maxH={420} label={b.heading} />
+        {b.note && <p class="blk__note prose">{b.note}</p>}
+      </div>
+    </section>
+  );
+
+  if (b.kind === 'sequence') return (
+    <section class={cls} aria-labelledby={`b${bi}`}>
+      <div class="wrap">
+        <h2 id={`b${bi}`} class="h2 blk__h">{b.heading}</h2>
+        <ol class="seq">
+          {b.steps.map((st, i) => (
+            <li class="seq__step">
+              <div class="seq__media">
+                <Figure piece={st.piece} caption={false} fit={st.fit ?? 'contain'} sizes={sizesFor(0.32)} />
+              </div>
+              <p class="seq__n display" aria-hidden="true">{i + 1}</p>
+              <h3 class="h3">{st.title}</h3>
+              <p class="seq__t">{st.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+
+  if (b.kind === 'statement') return (
+    <section class={cls}>
+      <div class="wrap stm">
+        <div>
+          <p class="stm__q display">“{b.text}”</p>
+          {b.note && <p class="stm__note prose">{b.note}</p>}
+        </div>
+        {b.pieces && <div class="stm__pieces">{b.pieces.map((p) => <Figure piece={p} sizes={sizesFor(0.3)} />)}</div>}
+      </div>
+    </section>
+  );
+
+  if (b.kind === 'anatomy') return (
+    <section class={cls} aria-labelledby={`b${bi}`}>
+      <div class="wrap anat">
+        <div class="anat__fig">
+          <Figure piece={b.piece} sizes={sizesFor(0.45)} caption={false} />
+          {b.zones.map((z, i) => (
+            <span class="anat__zone" style={`left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%`} aria-hidden="true"><i>{i + 1}</i></span>
+          ))}
+        </div>
+        <div class="anat__legend">
+          <h2 id={`b${bi}`} class="h2 blk__h">{b.heading}</h2>
+          <ol>
+            {b.zones.map((z, i) => (
+              <li><i aria-hidden="true">{i + 1}</i><div><h3 class="h3">{z.title}</h3><p>{z.text}</p></div></li>
+            ))}
+          </ol>
+          {b.note && <p class="blk__note">{b.note}</p>}
+        </div>
+      </div>
+    </section>
+  );
+
+  if (b.kind === 'markers') return (
+    <section class={cls} aria-labelledby={`b${bi}`}>
+      <div class="wrap anat anat--photo">
+        <div class="anat__fig">
+          <Figure piece={b.piece} sizes={sizesFor(0.62)} caption={false} />
+          {b.points.map((pt, i) => (
+            <span class="anat__dot" style={`left:${pt.x}%;top:${pt.y}%`} aria-hidden="true">{i + 1}</span>
+          ))}
+        </div>
+        <div class="anat__legend">
+          <h2 id={`b${bi}`} class="h2 blk__h">{b.heading}</h2>
+          <ol>
+            {b.points.map((pt, i) => (
+              <li><i aria-hidden="true">{i + 1}</i><div><h3 class="h3">{pt.title}</h3><p>{pt.text}</p></div></li>
+            ))}
+          </ol>
+          <p class="blk__note">{b.piece.name}. {b.piece.format}.</p>
+        </div>
+      </div>
+    </section>
+  );
+
+  if (b.kind === 'pair') {
+    const ra = ratio(b.a), rb = ratio(b.b), s = ra + rb;
+    return (
+      <section class={cls} aria-labelledby={b.heading ? `b${bi}` : undefined}>
+        <div class="wrap">
+          {b.heading && <h2 id={`b${bi}`} class="h2 blk__h">{b.heading}</h2>}
+          <div class="pair">
+            <ul class="jrow jrow--pair" style={`--rowmax:${Math.round(620 * s + 24)}px;--rowh:620px`}>
+              <li class="jrow__item" style={`--ir:${ra.toFixed(4)}`}><Figure piece={b.a} sizes={sizesFor(ra / s)} /></li>
+              <li class="jrow__item" style={`--ir:${rb.toFixed(4)}`}><Figure piece={b.b} sizes={sizesFor(rb / s)} /></li>
+            </ul>
+            {b.text && <p class="pair__text prose">{b.text}</p>}
+          </div>
+        </div>
+      </section>
+    );
+  }
+})}
+
+<style>
+  .blk { padding-block: var(--section); background: var(--bg); color: var(--fg); }
+  .blk.is-cont { padding-top: 0; }
+  .blk__h { margin-bottom: clamp(1.5rem, 3vw, 2.5rem); max-width: 22ch; }
+  .blk__note { margin-top: var(--s-5); color: var(--fg-2); font-size: var(--t-small); max-width: 60ch; }
+
+  /* Notas */
+  .notes { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-7) calc(var(--gap) * 2); }
+  .lead-ish { font-size: var(--t-lead); line-height: 1.4; font-weight: 450; }
+  .notes__ctx { max-width: 36ch; }
+  .notes__dec ul { margin-top: var(--s-4); display: grid; gap: var(--s-4); }
+  .notes__dec li { padding-top: var(--s-4); border-top: 1px solid var(--rule); max-width: 52ch; }
+
+  /* Paleta */
+  .sw__head { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: var(--gap); align-items: end; margin-bottom: var(--s-7); }
+  .sw__piece { max-width: 36rem; justify-self: end; width: 100%; }
+  .sw__row { display: grid; grid-template-columns: repeat(6, 1fr); min-height: clamp(14rem, 34vw, 28rem); }
+  .sw__row li { padding: var(--s-4) clamp(0.75rem, 1.4vw, 1.5rem); display: flex; flex-direction: column; gap: var(--s-1); }
+  .sw__row b { font-family: var(--display); font-weight: 760; font-size: clamp(1rem, 1.9vw, 1.75rem); font-stretch: 110%; }
+  .sw__row span { font-size: var(--t-small); font-weight: 520; }
+
+  /* Sangre */
+  .blk--bleed { padding-block: 0 var(--s-5); }
+  .blk--bleed :global(.bleed__fig .fig__media) { aspect-ratio: auto; height: min(92svh, 62rem); }
+  .blk--bleed .cap { margin-top: var(--s-3); }
+
+  .piece { max-width: 72rem; margin-inline: auto; }
+
+  /* Fila justificada: misma altura, anchos según proporción. En móvil, carrusel horizontal. */
+  .jrow { display: flex; gap: 24px; align-items: flex-start; max-width: var(--rowmax); }
+  .jrow__item { flex: var(--ir) 1 0%; min-width: 0; }
+  .jrow__item :global(.cap) { min-width: 7.5rem; }
+  .jrow:focus-visible { outline-offset: 6px; }
+
+  .grid { display: grid; gap: clamp(1.5rem, 3vw, 3rem) var(--gap); align-items: end; }
+  .grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  .stack { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); }
+
+  /* Secuencia de proceso */
+  .seq { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); counter-reset: s; }
+  .seq__media { aspect-ratio: 4 / 5; background: color-mix(in srgb, var(--fg) 6%, var(--bg)); padding: clamp(0.75rem, 2vw, 1.5rem); display: grid; }
+  .seq__media :global(.fig), .seq__media :global(.fig__media) { height: 100%; width: 100%; aspect-ratio: auto; }
+  .seq__media :global(.fig--cover) { margin: calc(clamp(0.75rem, 2vw, 1.5rem) * -1); height: calc(100% + 2 * clamp(0.75rem, 2vw, 1.5rem)); width: calc(100% + 2 * clamp(0.75rem, 2vw, 1.5rem)); }
+  .seq__n { font-size: clamp(3rem, 6vw, 5.5rem); --stretch: 60%; margin-top: var(--s-4); line-height: 0.9; }
+  .seq__step .h3 { margin-top: var(--s-2); }
+  .seq__t { margin-top: var(--s-2); max-width: 32ch; color: var(--fg-2); }
+
+  /* Frase */
+  .stm { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: var(--gap) calc(var(--gap) * 2); align-items: end; }
+  .stm__q { font-size: clamp(2.5rem, 6.6vw, 7rem); --stretch: 88%; line-height: 0.92; text-wrap: balance; }
+  .stm__note { margin-top: var(--s-6); font-size: var(--t-lead); line-height: 1.4; }
+  .stm__pieces { display: grid; gap: var(--gap); max-width: 22rem; justify-self: end; width: 100%; }
+
+  /* Anatomía y marcadores */
+  .anat { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--s-7) calc(var(--gap) * 3); align-items: center; }
+  .anat--photo { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
+  .anat__fig { position: relative; }
+  .anat__zone { position: absolute; border: 3px solid #ffd400; }
+  .anat__zone i, .anat__dot, .anat__legend i {
+    display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%;
+    background: #ffd400; color: #101010; font: 700 1rem/1 var(--text); font-style: normal;
+  }
+  .anat__zone i { position: absolute; top: -1.2rem; right: -1.2rem; }
+  .anat__dot { position: absolute; transform: translate(-50%, -50%); box-shadow: 0 0 0 4px rgb(16 16 16 / 0.35); }
+  .anat__legend ol { display: grid; gap: var(--s-5); }
+  .anat__legend li { display: grid; grid-template-columns: 2.25rem 1fr; gap: var(--s-4); align-items: start; }
+  .anat__legend p { margin-top: var(--s-1); color: var(--fg-2); }
+
+  /* Par */
+  .pair { display: grid; gap: var(--s-6); }
+  .pair__text { font-size: var(--t-lead); line-height: 1.4; max-width: 40ch; }
+
+  @media (max-width: 1099px) {
+    .notes, .stm, .anat, .anat--photo, .sw__head { grid-template-columns: 1fr; }
+    .sw__piece { justify-self: start; }
+    .sw__row { grid-template-columns: repeat(3, 1fr); }
+    .sw__row li { min-height: 9rem; }
+    .grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .anat__fig { max-width: 34rem; }
+  }
+  @media (max-width: 699px) {
+    .seq { grid-template-columns: 1fr; gap: var(--s-7); }
+    .grid--2, .grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5) var(--s-3); }
+    .sw__row { grid-template-columns: repeat(2, 1fr); }
+    /* Carrusel con scroll nativo y la siguiente pieza asomando. */
+    .jrow {
+      max-width: none; gap: 16px; overflow-x: auto; scroll-snap-type: x proximity;
+      margin-inline: calc(var(--margin) * -1); padding-inline: var(--margin); scroll-padding-inline: var(--margin);
+      scrollbar-width: none;
+    }
+    .jrow::-webkit-scrollbar { display: none; }
+    .jrow__item { flex: none; width: auto; scroll-snap-align: start; }
+    .jrow__item :global(.fig__media) { height: min(var(--rowh), 58svh); width: auto; aspect-ratio: var(--r); }
+    .jrow__item :global(.cap) { max-width: 16rem; }
+    .jrow--pair { overflow: visible; flex-direction: column; margin-inline: 0; padding-inline: 0; }
+    .jrow--pair .jrow__item :global(.fig__media) { height: auto; width: 100%; }
+    .jrow--pair .jrow__item :global(.fig) { max-width: calc(76svh * var(--r)); }
+  }
+</style>

@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import FormatFrame from '../components/FormatFrame.astro';
+import ProjectIndex from '../components/ProjectIndex.astro';
+import ScaleRow from '../components/ScaleRow.astro';
+import { projects, scaleBand } from '../data/projects';
+import { url } from '../lib/assets';
+
+const band = scaleBand.map((b) => ({ ...b, title: projects.find((p) => p.slug === b.project)!.title }));
+---
+<Base
+  title="Javi Molin — Diseñadora Integral UC"
+  description="Portfolio de María Javiera Molin, Diseñadora Integral UC. Dirección de arte, campañas, eventos y piezas que funcionan en todos los formatos, del lienzo de cinco metros al mensaje de WhatsApp."
+  current="inicio"
+>
+  <FormatFrame />
+  <ProjectIndex />
+
+  <section class="scale-home wrap" aria-labelledby="scale-title">
+    <div class="scale-home__head">
+      <h2 id="scale-title" class="h2">A escala</h2>
+      <p class="muted">Algunas piezas del año en su proporción real, sobre una misma base. Del lienzo de cinco metros al sticker de doce centímetros, la idea tiene que resistir el cambio.</p>
+    </div>
+    <ScaleRow pieces={band} maxH={340} label="Piezas de distintos proyectos a escala real" />
+  </section>
+
+  <section class="about wrap" aria-labelledby="about-title">
+    <h2 id="about-title" class="about__title display">Pienso cada campaña como un sistema.</h2>
+    <div class="about__body prose">
+      <p>Soy Javi Molin, Diseñadora Integral de la Pontificia Universidad Católica de Chile, con foco en diseño gráfico y branding. En 2025 fui diseñadora de marketing en Ripley: campañas, eventos y activaciones para Chile y Perú, junto a Marketing, Contenidos y Comercial, y con agencias y productoras.</p>
+      <p>Me interesa la parte que no se ve en la pieza final: medir, adaptar a veinte formatos, revisar el legal y cerrar originales para que la imprenta no tenga dudas.</p>
+      <p><a href={url('sobre-mi/')}>Más sobre mí, experiencia y formación</a></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .scale-home { padding-top: var(--section); }
+  .scale-home__head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap); align-items: end; margin-bottom: var(--s-7); }
+  .scale-home__head p { max-width: 44ch; }
+
+  .about { padding-top: var(--section); display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-6) calc(var(--gap) * 2); align-items: start; }
+  .about__title { font-size: clamp(2.5rem, 5.6vw, 5.5rem); --stretch: 72%; line-height: 0.92; max-width: 12ch; }
+  .about__body { font-size: var(--t-body); }
+
+  @media (max-width: 1099px) {
+    .scale-home__head, .about { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/assets';
+---
+<Base title="Página no encontrada — Javi Molin" description="Esta página no existe.">
+  <section class="nf wrap">
+    <h1 class="nf__t display">Fuera de formato</h1>
+    <p class="lead">Esta página no existe o cambió de lugar.</p>
+    <p><a href={url('')}>Volver al inicio</a></p>
+  </section>
+</Base>
+<style>
+  .nf { padding-block: clamp(3rem, 12vh, 8rem); display: grid; gap: var(--s-5); }
+  .nf__t { font-size: var(--t-display); --stretch: 150%; font-weight: 800; line-height: 0.86; }
+</style>
