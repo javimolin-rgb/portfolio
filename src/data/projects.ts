@@ -36,6 +36,8 @@ export type Block =
 export type Project = {
   slug: string;
   title: string;
+  /** Tipo de proyecto, tal como se describe en el resumen. */
+  category: string;
   /** Título partido en líneas para el índice y el caso. */
   lines?: string[];
   client: string;
@@ -64,6 +66,7 @@ export const projects: Project[] = [
   {
     slug: 'dia-del-nino',
     title: 'Día del Niño',
+    category: 'Evento en tienda',
     lines: ['Día del', 'Niño'],
     client: 'Ripley y Banco Ripley',
     year: '2025',
@@ -186,6 +189,7 @@ export const projects: Project[] = [
   {
     slug: 'campeones-sin-limites',
     title: 'Campeones Sin Límites',
+    category: 'Evento deportivo y campaña',
     lines: ['Campeones', 'Sin Límites'],
     client: 'Ripley, Teletón y Canal 13',
     year: '2025',
@@ -314,6 +318,7 @@ export const projects: Project[] = [
   {
     slug: 'toys-r-us',
     title: 'Toys"R"Us llega a Ripley',
+    category: 'Lanzamiento',
     lines: ['Toys"R"Us', 'llega a Ripley'],
     client: 'Ripley',
     year: '2025',
@@ -442,6 +447,7 @@ export const projects: Project[] = [
   {
     slug: 'new-romantic',
     title: 'New Romantic y moda',
+    category: 'Campaña de temporada',
     lines: ['New Romantic', 'y moda'],
     client: 'Ripley · marcas de moda',
     year: '2025',
@@ -528,6 +534,7 @@ export const projects: Project[] = [
   {
     slug: 'ventas-privadas',
     title: 'Ventas Privadas y Days',
+    category: 'Sistema de piezas',
     lines: ['Ventas', 'Privadas', 'y Days'],
     client: 'Ripley, Banco Ripley y Ripley Puntos',
     year: '2025',
@@ -624,6 +631,7 @@ export const projects: Project[] = [
   {
     slug: 'me-fascinan-las-sandalias',
     title: 'Me fascinan las sandalias',
+    category: 'Video para pantallas',
     lines: ['Me fascinan', 'las sandalias'],
     client: 'Ripley · Calzado',
     year: '2025',
@@ -661,6 +669,7 @@ export const projects: Project[] = [
   {
     slug: 'ripley-beauty',
     title: 'Ripley Beauty',
+    category: 'Inauguración y eventos',
     lines: ['Ripley', 'Beauty'],
     client: 'Ripley Beauty',
     year: '2025',
@@ -754,6 +763,7 @@ export const projects: Project[] = [
   {
     slug: 'gamer-week',
     title: 'Gamer Week',
+    category: 'Propuesta de identidad',
     lines: ['Gamer', 'Week'],
     client: 'Ripley Perú',
     year: '2025',
@@ -794,6 +804,7 @@ export const projects: Project[] = [
   {
     slug: 'fiestas-patrias',
     title: 'Fiestas Patrias y gift cards',
+    category: 'Piezas de temporada',
     lines: ['Fiestas Patrias', 'y gift cards'],
     client: 'Ripley',
     year: '2025',
@@ -854,6 +865,7 @@ export const projects: Project[] = [
   {
     slug: 'activaciones',
     title: 'Activaciones en tienda',
+    category: 'Activaciones con marcas',
     lines: ['Activaciones', 'en tienda'],
     client: 'Ripley con marcas invitadas',
     year: '2025',
