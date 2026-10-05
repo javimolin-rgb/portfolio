@@ -28,7 +28,13 @@ const herramientas = ['Illustrator', 'Photoshop', 'InDesign', 'After Effects', '
   <section class="bio wrap">
     <h1 class="bio__title display">Javiera Molin</h1>
     <div class="bio__cols">
-      <p class="lead bio__lead">Diseñadora Integral de la Pontificia Universidad Católica de Chile, con foco en diseño gráfico y branding, y un diplomado en Branding y Valor de Marca.</p>
+      <div>
+        <p class="lead bio__lead">Diseñadora Integral de la Pontificia Universidad Católica de Chile, con foco en diseño gráfico y branding, y un diplomado en Branding y Valor de Marca.</p>
+        <div class="actions bio__actions">
+          <a class="btn" href={url('cv/CV-Javi-Molin.pdf')} download>Descargar CV</a>
+          <a class="btn btn--ghost" href="mailto:javimolin@gmail.com">Escribir un correo</a>
+        </div>
+      </div>
       <div class="prose">
         <p>En 2025 trabajé como diseñadora de marketing en Ripley. Hice campañas comerciales y eventos para Chile y Perú: piezas para redes, e-commerce, pantallas de Metro, pendones, lienzos de cinco metros, módulos de tienda y merchandising. Trabajé todos los días con los equipos de Marketing, Contenidos y Comercial, y con agencias y productoras.</p>
         <p>Me gusta la parte del proyecto que no se ve en la pieza final: medir, adaptar a veinte formatos, revisar el legal y cerrar originales para que la imprenta no tenga dudas.</p>
@@ -83,20 +89,21 @@ const herramientas = ['Illustrator', 'Photoshop', 'InDesign', 'After Effects', '
 </Base>
 
 <style>
-  .bio { padding-top: clamp(2rem, 7vh, 5rem); }
-  .bio__title { font-size: var(--t-display); --stretch: 118%; font-weight: 800; line-height: 0.86; }
+  .bio { padding-top: clamp(3rem, 10vh, 7rem); }
+  .bio__title { font-size: var(--t-display); }
   .bio__cols { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-6) calc(var(--gap) * 2); margin-top: clamp(2rem, 5vw, 4rem); }
   .bio__lead { max-width: 30ch; }
+  .bio__actions { margin-top: var(--s-5); }
 
   .cv { padding-top: var(--section); }
   .cv__list { margin-top: var(--s-6); border-top: 1px solid var(--rule); }
   .cv__list li { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: var(--gap); padding-block: var(--s-5); border-bottom: 1px solid var(--rule); }
-  .cv__when { font-weight: 600; font-variant-numeric: tabular-nums; }
-  .cv__where { margin-top: var(--s-1); font-weight: 560; }
+  .cv__when { color: var(--fg-2); font-variant-numeric: tabular-nums; }
+  .cv__where { margin-top: var(--s-1); }
   .cv__what { margin-top: var(--s-2); max-width: 60ch; color: var(--fg-2); }
 
   .tools { padding-top: var(--section); display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-7) calc(var(--gap) * 2); }
-  .tools__list { margin-top: var(--s-5); display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); font-size: var(--t-lead); line-height: 1.3; }
+  .tools__list { margin-top: var(--s-5); display: grid; gap: var(--s-2); }
 
   @media (max-width: 899px) {
     .bio__cols, .tools { grid-template-columns: 1fr; }
