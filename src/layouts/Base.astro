@@ -1,23 +1,20 @@
 ---
 import '../styles/global.css';
-import anybodyLatin from '../fonts/anybody-latin.woff2?url';
+import serifLatin from '../fonts/instrument-serif-latin.woff2?url';
+import monaLatin from '../fonts/mona-sans-latin.woff2?url';
 import { url } from '../lib/assets';
 
 interface Props {
   title: string;
   description: string;
   ogImage?: string;
-  /** Colores de la página (campo del proyecto). */
-  bg?: string;
-  fg?: string;
   current?: 'inicio' | 'trabajo' | 'sobre';
   /** El teléfono solo aparece en Sobre mí. */
   phone?: boolean;
 }
-const { title, description, ogImage, bg, fg, current, phone = false } = Astro.props;
+const { title, description, ogImage, current, phone = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const og = ogImage ? new URL(ogImage, Astro.site).href : new URL(url('og.jpg'), Astro.site).href;
-const pageStyle = bg ? `--bg:${bg};--fg:${fg};--fg-2:${fg};` : '';
 const person = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -32,7 +29,7 @@ const person = {
 };
 ---
 <!doctype html>
-<html lang="es-CL" style={pageStyle}>
+<html lang="es-CL">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -41,8 +38,9 @@ const person = {
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
     <link rel="sitemap" href={url('sitemap-index.xml')} />
-    <link rel="preload" href={anybodyLatin} as="font" type="font/woff2" crossorigin />
-    <meta name="theme-color" content={bg ?? '#eaeae6'} />
+    <link rel="preload" href={serifLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monaLatin} as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#ffffff" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_CL" />
     <meta property="og:site_name" content="Javi Molin" />
@@ -60,9 +58,9 @@ const person = {
       <a class="bar__name" href={url('')} aria-current={current === 'inicio' ? 'page' : undefined}>Javi Molin</a>
       <nav aria-label="Principal">
         <ul>
-          <li><a href={url('#trabajo')} aria-current={current === 'trabajo' ? 'page' : undefined}>Trabajo</a></li>
+          <li><a href={url('#trabajo')} aria-current={current === 'trabajo' ? 'page' : undefined}>Proyectos</a></li>
           <li><a href={url('sobre-mi/')} aria-current={current === 'sobre' ? 'page' : undefined}>Sobre mí</a></li>
-          <li><a href={url('#contacto')}>Contacto</a></li>
+          <li><a class="bar__cta" href="#contacto">Contacto</a></li>
         </ul>
       </nav>
     </header>
@@ -70,32 +68,25 @@ const person = {
       <slot />
     </main>
     <footer class="foot wrap" id="contacto">
-      <p class="foot__lead">¿Un proyecto, un rol, una idea?</p>
-      <a class="foot__mail display" href="mailto:javimolin@gmail.com">javimolin@gmail.com</a>
-      <ul class="foot__links">
-        <li><a href="https://www.linkedin.com/in/javimolin/" rel="me">LinkedIn</a></li>
-        {phone && <li><a href="tel:+56966303974">+56 9 6630 3974</a></li>}
-        <li><a href={url('cv/CV-Javi-Molin.pdf')} download>CV en PDF</a></li>
-        <li>Santiago, Chile</li>
-      </ul>
-      <p class="foot__legal small">María Javiera Molin, Diseñadora Integral UC. Las fotos de modelos y producto son material de las marcas; el diseño, la composición y los originales son míos, salvo donde se indica otra autoría.</p>
+      <div class="foot__grid">
+        <div>
+          <h2 class="foot__title h2">Conversemos</h2>
+          <p class="foot__text muted">Busco un rol in-house y tomo proyectos freelance desde Santiago. Escríbeme y te respondo pronto.</p>
+        </div>
+        <div class="foot__actions">
+          <div class="actions">
+            <a class="btn" href="mailto:javimolin@gmail.com">Escribir un correo</a>
+            <a class="btn btn--ghost" href={url('cv/CV-Javi-Molin.pdf')} download>Descargar CV</a>
+          </div>
+          <ul class="foot__links">
+            <li><a href="mailto:javimolin@gmail.com">javimolin@gmail.com</a></li>
+            <li><a href="https://www.linkedin.com/in/javimolin/" rel="me">LinkedIn</a></li>
+            {phone && <li><a href="tel:+56966303974">+56 9 6630 3974</a></li>}
+          </ul>
+        </div>
+      </div>
+      <p class="foot__legal small muted">María Javiera Molin, Diseñadora Integral UC. Las fotos de modelos y producto son material de las marcas; el diseño, la composición y los originales son míos, salvo donde se indica otra autoría.</p>
     </footer>
-    <script>
-      // Títulos con ancho extremo: si una línea no cabe en su columna, el título se achica lo justo.
-      const fitAll = () => {
-        document.querySelectorAll<HTMLElement>('[data-fit]').forEach((el) => {
-          el.style.removeProperty('--k');
-          const box = el.parentElement!;
-          const cs = getComputedStyle(box);
-          const w = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-          const over = el.scrollWidth / w;
-          if (over > 1) el.style.setProperty('--k', String(0.985 / over));
-        });
-      };
-      document.fonts.ready.then(fitAll);
-      let t: number | undefined;
-      window.addEventListener('resize', () => { window.clearTimeout(t); t = window.setTimeout(fitAll, 150); });
-    </script>
   </body>
 </html>
 
@@ -103,32 +94,31 @@ const person = {
   .bar {
     position: sticky; top: 0; z-index: 20;
     display: flex; justify-content: space-between; align-items: center; gap: var(--s-4);
-    min-height: 3.5rem; padding-block: var(--s-3);
-    background: var(--bg); color: var(--fg);
-    transition: background-color 360ms ease, color 360ms ease;
+    min-height: 4rem;
+    background: rgb(255 255 255 / 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   .bar a { text-decoration: none; }
-  .bar a:hover, .bar a[aria-current='page'] { text-decoration: underline; text-decoration-thickness: 2px; }
-  .bar__name { font-family: var(--display); font-weight: 760; font-stretch: 125%; font-size: 1.0625rem; letter-spacing: -0.01em; view-transition-name: sitename; }
-  .bar ul { display: flex; gap: clamp(1rem, 2.4vw, 2rem); font-weight: 560; }
-  .bar li a { display: inline-block; padding-block: var(--s-2); }
+  .bar__name { font-family: var(--display); font-size: 1.375rem; line-height: 1; view-transition-name: sitename; }
+  .bar ul { font-size: 0.875rem; }
+  .bar ul { display: flex; align-items: center; gap: clamp(1.25rem, 2.6vw, 2.25rem); }
+  .bar li a { display: inline-block; padding-block: var(--s-2); color: var(--fg-2); transition: color 160ms ease; }
+  .bar li a:hover, .bar li a[aria-current='page'] { color: var(--fg); }
 
-  .foot { padding-top: var(--section); padding-bottom: var(--s-7); background: var(--bg); color: var(--fg); }
-  .foot__lead { font-size: var(--t-lead); font-weight: 450; }
-  .foot__mail {
-    display: inline-block; margin-top: var(--s-4);
-    font-size: min(8.5rem, 6.9vw); --stretch: 118%; white-space: nowrap;
-    text-decoration-thickness: 0.06em; text-underline-offset: 0.12em;
-    overflow-wrap: anywhere;
-  }
-  .foot__mail:hover { text-decoration-thickness: 0.1em; }
-  .foot__links { display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-6); margin-top: var(--s-7); font-weight: 560; }
-  .foot__links li { padding-block: var(--s-2); }
-  .foot__legal { margin-top: var(--s-6); max-width: 70ch; color: var(--fg-2); }
+  .bar li a.bar__cta { color: var(--fg); border: 1px solid #cfcfca; border-radius: 6px; padding: 0.375rem 0.875rem; transition: border-color 160ms ease; }
+  .bar li a.bar__cta:hover { border-color: var(--ink); }
+
+  .foot { margin-top: var(--section); padding-block: var(--s-8) var(--s-6); border-top: 1px solid var(--rule); }
+  .foot__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-6) var(--gap); align-items: end; }
+  .foot__text { margin-top: var(--s-3); max-width: 40ch; }
+  .foot__links { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-5); margin-top: var(--s-4); font-size: var(--t-small); }
+  .foot__links a { color: var(--fg-2); }
+  .foot__legal { margin-top: var(--s-8); max-width: 70ch; }
+  @media (max-width: 899px) { .foot__grid { grid-template-columns: 1fr; } }
 
   @media (max-width: 520px) {
-    .foot__mail { --stretch: 62%; font-size: 12.4vw; }
-    .bar ul { gap: 0.9rem; font-size: 0.9375rem; }
-    .bar__name { font-stretch: 100%; font-size: 0.9375rem; }
+    .bar ul { gap: 0.875rem; font-size: 0.875rem; }
+    .bar__name { font-size: 1.1875rem; }
   }
 </style>
