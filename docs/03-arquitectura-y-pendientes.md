@@ -26,7 +26,6 @@
 # Pendientes (no se inventó nada para cubrirlos)
 - **Experimentación con IA:** no hay proyectos documentados. KESHI, VOLT y PAPEL siguen fuera hasta decidir si se muestran como ejercicios.
 - **Foto personal** para Sobre mí (el diseño funciona sin ella; se puede sumar al lado de la bio).
-- **Rol de Regina Latife** en Campeones Sin Límites.
 - **Mesones de Toys"R"Us:** confirmar que la gráfica instalada es tuya (hoy no se muestran en el caso web).
 - **Videos en alta** de sandalias y lanzamientos (se usan los comprimidos).
 - **Deportista menor de edad:** se excluyeron el key visual y el tótem de mano de una deportista de 17 años (también se sacaron de la presentación).
