@@ -41,7 +41,6 @@ Fuentes revisadas: el sitio anterior (`sitio/`, HTML + JS con datos en `perfil.j
 ## Información que falta (no se inventa)
 - **Experimentación con IA:** no hay proyectos documentados. KESHI, VOLT y PAPEL siguen ocultos hasta que Javi decida si se muestran como ejercicios.
 - **Foto personal** para "Sobre mí".
-- **Rol de Regina Latife** en Campeones Sin Límites.
 - **Correo a publicar:** se usa javimolin@gmail.com (el que Javi indicó en el brief).
 - **Videos en alta** (sandalias, lanzamientos): hoy se usan las versiones comprimidas.
 - **Resultados o métricas:** no existen en el material; el sitio no muestra ninguno.
