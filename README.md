@@ -31,7 +31,7 @@ src/styles/global.css    Tokens de color, tipografía y superficies
 ## Agregar un proyecto
 
 1. Crea `src/assets/work/mi-proyecto/` y pon ahí las imágenes (JPG o PNG, lado mayor hasta 2400 px).
-2. En `src/data/projects.ts`, copia un proyecto completo y cambia `slug`, textos, colores (`field` y `ink`, con contraste AA) y `format` (el formato emblemático define el ancho del título).
+2. En `src/data/projects.ts`, copia un proyecto completo y cambia `slug`, textos y piezas (`field`, `ink` y `format` se conservan en los datos, pero el diseño actual no los usa).
 3. Arma el caso con bloques (`notes`, `row`, `scale`, `sequence`, `anatomy`, `pair`, `grid`, `stack`, `statement`, `bleed`). Ver DESIGN.md §8.
 4. Videos: `public/video/nombre.mp4` y una imagen de póster con `video: 'nombre'` en la pieza.
 
@@ -43,4 +43,4 @@ Queda en `https://javimolin-rgb.github.io/portfolio/`. Para un dominio propio, c
 
 ## Fuentes
 
-Anybody y Mona Sans, ambas con licencia SIL Open Font License (ver `src/fonts/`).
+Instrument Serif y Mona Sans, ambas con licencia SIL Open Font License (ver `src/fonts/`).
