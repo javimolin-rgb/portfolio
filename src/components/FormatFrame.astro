@@ -1,28 +1,35 @@
 ---
-/* El momento firma: una pieza real cambia de formato y el nombre cambia de ancho con ella. */
+/* El momento firma: una pieza real cambia de formato dentro de un mismo marco. */
 import { Picture } from 'astro:assets';
-import { formatsReel, projects, stretchFor } from '../data/projects';
+import { formatsReel, projects } from '../data/projects';
 import { asset, url } from '../lib/assets';
 
 const reel = formatsReel.map((f, i) => {
   const img = asset(f.piece.ref);
   const project = projects.find((p) => p.slug === f.project)!;
-  return { ...f, img, i, stretch: stretchFor(f.ratio), project };
+  return { ...f, img, i, project };
 });
 const first = reel[0];
 ---
-<section class="hero wrap" aria-labelledby="hero-name" data-frame style={`--stretch:${first.stretch}%`}>
+<section class="hero wrap" aria-labelledby="hero-name" data-frame>
   <div class="hero__text">
-    <h1 id="hero-name" class="hero__name display">
-      <span>Javi</span><span>Molin</span>
-    </h1>
-    <p class="hero__intro lead">
-      Diseñadora Integral UC. Dirección de arte, campañas y eventos para marcas en Chile y Perú, con piezas que funcionan igual en un pendón de dos metros que en un mensaje de WhatsApp.
-    </p>
+    <h1 id="hero-name" class="hero__name display">Javi Molin</h1>
+    <div class="hero__body">
+      <p class="hero__role">Diseñadora gráfica, campañas y branding</p>
+      <p class="hero__intro lead">
+        Diseñadora Integral UC. Campañas, eventos y piezas de tienda para marcas en Chile y Perú, pensadas para funcionar igual en un pendón de dos metros que en un mensaje de WhatsApp.
+      </p>
+      <div class="actions hero__actions">
+        <a class="btn" href="#trabajo">Ver proyectos</a>
+        <a class="btn btn--ghost" href={url('cv/CV-Javi-Molin.pdf')} download>Descargar CV</a>
+      </div>
+    </div>
   </div>
 
   <div class="hero__stage">
+    <p class="frame__label small muted">Una idea, seis formatos</p>
     <div class="frame" data-stage>
+      <div class="frame__inner">
       <div class="frame__box" data-box style={`--ratio:${first.ratio}`}>
         {reel.map((r) => (
           <Picture
@@ -30,7 +37,7 @@ const first = reel[0];
             src={r.img}
             alt={`${r.piece.name}, ${r.piece.format}. Proyecto ${r.project.title}.`}
             widths={[500, 900, 1400].filter((w) => w <= r.img.width)}
-            sizes="(min-width: 1100px) 40vw, 90vw"
+            sizes="(min-width: 900px) 36vw, 90vw"
             formats={['avif']}
             fallbackFormat="webp"
             loading={r.i === 0 ? 'eager' : 'lazy'}
@@ -40,15 +47,15 @@ const first = reel[0];
           />
         ))}
       </div>
+      </div>
     </div>
 
     <div class="frame__meta">
       <p class="frame__now" aria-live="polite">
-        <b data-now-name>{first.piece.name}</b>
-        <span data-now-format>{first.piece.format}</span>
+        <span><b data-now-name>{first.piece.name}</b>, <span data-now-format>{first.piece.format}</span></span>
         <a data-now-link href={url(`trabajo/${first.project.slug}/`)}>{first.project.title}</a>
       </p>
-      <div class="frame__controls" role="group" aria-label="Ver la misma mirada en otros formatos">
+      <div class="frame__controls" role="group" aria-label="Elegir formato">
         {reel.map((r) => (
           <button
             type="button"
@@ -56,13 +63,12 @@ const first = reel[0];
             aria-pressed={r.i === 0 ? 'true' : 'false'}
             data-go={r.i}
             data-ratio={r.ratio}
-            data-stretch={r.stretch}
             data-name={r.piece.name}
             data-format={r.piece.format}
             data-href={url(`trabajo/${r.project.slug}/`)}
             data-project={r.project.title}
             data-round={r.piece.round ? '1' : ''}
-          >{r.piece.name}</button>
+          ><span class="sr-only">{r.piece.name}</span></button>
         ))}
         <button type="button" class="frame__pause" data-pause aria-pressed="false">Pausar</button>
       </div>
@@ -74,27 +80,20 @@ const first = reel[0];
   .hero {
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: var(--gap) calc(var(--gap) * 2);
-    align-items: end;
-    min-height: calc(100svh - 3.5rem);
-    padding-top: clamp(1.5rem, 4vh, 3rem);
-    padding-bottom: var(--s-7);
+    gap: var(--s-7) clamp(2rem, 6vw, 7rem);
+    align-items: start;
+    padding-top: clamp(3rem, 10vh, 7rem);
   }
-  .hero__text { position: relative; container-type: inline-size; align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: var(--s-7); }
-  .hero__name {
-    font-size: var(--fs, 22.5cqw);
-    line-height: 0.84;
-    font-weight: 800;
-    letter-spacing: -0.025em;
-    font-stretch: var(--stretch);
-    transition: font-stretch 700ms var(--ease-in-out), font-size 700ms var(--ease-in-out);
-    text-wrap: nowrap;
-  }
-  .hero__name span { display: block; }
-  .hero__intro { max-width: 30ch; }
+  .hero__text { display: flex; flex-direction: column; justify-content: center; gap: var(--s-6); align-self: stretch; padding-bottom: var(--s-6); }
+  .hero__name { font-size: var(--t-hero); line-height: 0.95; letter-spacing: -0.02em; }
+  .hero__body { display: grid; gap: var(--s-4); }
+  .hero__role { font-weight: 500; }
+  .hero__actions { margin-top: var(--s-2); }
+  .hero__intro { max-width: 36ch; color: var(--fg-2); }
 
-  .hero__stage { display: flex; flex-direction: column; gap: var(--s-5); min-width: 0; }
-  .frame { position: relative; height: min(64svh, 44rem); container-type: size; display: grid; place-items: end start; }
+  .hero__stage { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
+  .frame { position: relative; aspect-ratio: 4 / 5; max-height: 70svh; background: var(--plate); padding: clamp(1.5rem, 3vw, 2.75rem); }
+  .frame__inner { position: relative; width: 100%; height: 100%; container-type: size; display: grid; place-items: center; }
   .frame__box {
     position: relative;
     width: min(100cqw, calc(100cqh * var(--ratio)));
@@ -105,27 +104,23 @@ const first = reel[0];
   :global(.frame__img.is-on) { opacity: 1; }
   :global(.frame__img.is-round) { border-radius: 50%; }
 
-  .frame__now { display: flex; flex-wrap: wrap; gap: 0 var(--s-3); font-size: var(--t-small); line-height: 1.4; }
-  .frame__now b { font-weight: 640; }
-  .frame__now span { color: var(--fg-2); }
-  .frame__now a { margin-left: auto; }
-  .frame__controls { display: flex; flex-wrap: wrap; gap: 0 var(--s-4); margin-top: var(--s-3); border-top: 1px solid var(--rule); padding-top: var(--s-2); }
-  .frame__btn, .frame__pause {
-    min-height: 44px; font-size: var(--t-small); font-weight: 560;
-    text-decoration-line: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 0.35em;
-    transition: text-decoration-color 160ms ease;
-  }
-  .frame__btn:hover { text-decoration-color: var(--rule); }
-  .frame__btn[aria-pressed='true'] { text-decoration-color: currentColor; }
-  .frame__pause { margin-left: auto; color: var(--fg-2); }
+  .frame__label { margin-bottom: calc(var(--s-1) * -1); }
+  .frame__now { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 var(--s-3); font-size: var(--t-small); line-height: 1.4; }
+  .frame__now b { font-weight: 500; }
+  .frame__now span span { color: var(--fg-2); }
+  .frame__controls { display: flex; align-items: center; gap: var(--s-1); }
+  .frame__btn { flex: 1; min-height: 32px; position: relative; }
+  .frame__btn::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: var(--rule); transition: background-color 200ms ease; }
+  .frame__btn:hover::after { background: #bdbdb7; }
+  .frame__btn[aria-pressed='true']::after { background: var(--ink); }
+  .frame__pause { margin-left: var(--s-3); min-height: 32px; font-size: var(--t-small); color: var(--fg-2); }
+  .frame__pause:hover { color: var(--fg); }
 
-  @media (max-width: 1099px) {
-    .hero { grid-template-columns: 1fr; min-height: auto; align-items: start; }
-    .hero__text { gap: var(--s-6); }
-    .frame { height: min(56svh, 38rem); }
+  @media (max-width: 899px) {
+    .hero { grid-template-columns: 1fr; gap: var(--s-7); }
+    .frame { aspect-ratio: 1 / 1; max-height: none; }
   }
   @media (max-width: 599px) {
-    .frame { height: min(52svh, 30rem); }
     .frame__now a { margin-left: 0; flex-basis: 100%; }
   }
 </style>
@@ -147,42 +142,9 @@ const first = reel[0];
     let visible = true;
     let timer: number | undefined;
 
-    // El nombre llena el ancho de su columna; si el formato es vertical, crece en alto hasta un tope.
-    const name = root.querySelector<HTMLElement>('.hero__name')!;
-    const col = root.querySelector<HTMLElement>('.hero__text')!;
-    const intro = root.querySelector<HTMLElement>('.hero__intro')!;
-    // Mide el ancho real de la línea más larga en el ancho tipográfico pedido (un elemento nuevo cada vez).
-    const emFor = (st: string) => {
-      const m = document.createElement('span');
-      m.setAttribute('aria-hidden', 'true');
-      m.style.cssText = `position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;font-family:Anybody,sans-serif;font-weight:800;letter-spacing:-0.025em;font-size:100px;font-stretch:${st}%`;
-      m.textContent = 'Molin';
-      document.body.appendChild(m);
-      const w = m.getBoundingClientRect().width;
-      m.remove();
-      return w / 100 || 3;
-    };
-    const fit = () => {
-      const st = btns[current].dataset.stretch!;
-      const em = emFor(st);
-      const wide = window.matchMedia('(min-width: 1100px)').matches;
-      // En gran formato horizontal (lienzo) el nombre toma todo el ancho, sobre el marco bajo.
-      const ratio = Number(btns[current].dataset.ratio);
-      const rs = getComputedStyle(root);
-      const full = root.clientWidth - parseFloat(rs.paddingLeft) - parseFloat(rs.paddingRight);
-      const w = wide && ratio >= 3 ? full : col.clientWidth;
-      const availH = wide
-        ? root.clientHeight - intro.offsetHeight - 96
-        : Math.min(window.innerHeight * 0.42, 460);
-      const byW = (w * 0.985) / em;
-      const byH = availH / (2 * 0.84);
-      root.style.setProperty('--fs', `${Math.max(48, Math.min(byW, byH))}px`);
-    };
-
     const show = (i: number) => {
       current = (i + btns.length) % btns.length;
       const b = btns[current];
-      root.style.setProperty('--stretch', `${b.dataset.stretch}%`);
       box.style.setProperty('--ratio', b.dataset.ratio!);
       imgs.forEach((img, k) => {
         img.classList.toggle('is-on', k === current);
@@ -195,7 +157,6 @@ const first = reel[0];
       nowFormat.textContent = b.dataset.format!;
       nowLink.textContent = b.dataset.project!;
       nowLink.href = b.dataset.href!;
-      fit();
     };
 
     const schedule = () => {
@@ -218,9 +179,6 @@ const first = reel[0];
     stage.addEventListener('focusin', () => { hovering = true; schedule(); });
     stage.addEventListener('focusout', () => { hovering = false; schedule(); });
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; schedule(); }, { threshold: 0.2 }).observe(root);
-    document.fonts.load('800 100px Anybody', 'Molin').then(() => document.fonts.ready).then(fit);
-    let rz: number | undefined;
-    window.addEventListener('resize', () => { window.clearTimeout(rz); rz = window.setTimeout(fit, 120); });
     schedule();
   }
 </script>

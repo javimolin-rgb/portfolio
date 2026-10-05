@@ -48,9 +48,9 @@ const sizesFor = (share: number) => `(min-width: 1100px) ${Math.max(18, Math.rou
   );
 
   if (b.kind === 'bleed') return (
-    <section class={cls}>
+    <section class={`${cls} wrap`}>
       <Figure piece={b.piece} sizes="100vw" fit="cover" class="bleed__fig" caption={false} />
-      <p class="cap wrap"><b>{b.piece.name}</b>{b.piece.format && <span>{b.piece.format}</span>}</p>
+      <p class="cap"><b>{b.piece.name}</b>{b.piece.format && <span>{b.piece.format}</span>}</p>
     </section>
   );
 
@@ -63,7 +63,7 @@ const sizesFor = (share: number) => `(min-width: 1100px) ${Math.max(18, Math.rou
   if (b.kind === 'row') {
     const s = sumR(b.pieces);
     const max = rowMax[b.size ?? 'm'];
-    const gaps = (b.pieces.length - 1) * 24;
+    const gaps = (b.pieces.length - 1) * 32;
     return (
       <section class={cls} aria-labelledby={b.heading ? `b${bi}` : undefined}>
         <div class="wrap">
@@ -123,7 +123,7 @@ const sizesFor = (share: number) => `(min-width: 1100px) ${Math.max(18, Math.rou
               <div class="seq__media">
                 <Figure piece={st.piece} caption={false} fit={st.fit ?? 'contain'} sizes={sizesFor(0.32)} />
               </div>
-              <p class="seq__n display" aria-hidden="true">{i + 1}</p>
+              <p class="seq__n" aria-hidden="true">{i + 1}</p>
               <h3 class="h3">{st.title}</h3>
               <p class="seq__t">{st.text}</p>
             </li>
@@ -209,84 +209,80 @@ const sizesFor = (share: number) => `(min-width: 1100px) ${Math.max(18, Math.rou
 })}
 
 <style>
-  .blk { padding-block: var(--section); background: var(--bg); color: var(--fg); }
-  .blk.is-cont { padding-top: 0; }
-  .blk__h { margin-bottom: clamp(1.5rem, 3vw, 2.5rem); max-width: 22ch; }
+  .blk { padding-top: var(--section); }
+  .blk__h { margin-bottom: clamp(1.5rem, 3vw, 2.25rem); max-width: 26ch; }
   .blk__note { margin-top: var(--s-5); color: var(--fg-2); font-size: var(--t-small); max-width: 60ch; }
 
   /* Notas */
-  .notes { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-7) calc(var(--gap) * 2); }
-  .lead-ish { font-size: var(--t-lead); line-height: 1.4; font-weight: 450; }
-  .notes__ctx { max-width: 36ch; }
-  .notes__dec ul { margin-top: var(--s-4); display: grid; gap: var(--s-4); }
-  .notes__dec li { padding-top: var(--s-4); border-top: 1px solid var(--rule); max-width: 52ch; }
+  .notes { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-7) var(--gap); }
+  .lead-ish { font-size: var(--t-lead); line-height: 1.45; }
+  .notes__ctx { max-width: 40ch; }
+  .notes__dec .h3 { color: var(--fg-2); font-weight: 500; font-size: var(--t-small); letter-spacing: 0; font-stretch: 100%; }
+  .notes__dec ul { margin-top: var(--s-3); border-top: 1px solid var(--rule); }
+  .notes__dec li { padding-block: var(--s-4); border-bottom: 1px solid var(--rule); max-width: 52ch; }
 
   /* Paleta */
-  .sw__head { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: var(--gap); align-items: end; margin-bottom: var(--s-7); }
-  .sw__piece { max-width: 36rem; justify-self: end; width: 100%; }
-  .sw__row { display: grid; grid-template-columns: repeat(6, 1fr); min-height: clamp(14rem, 34vw, 28rem); }
-  .sw__row li { padding: var(--s-4) clamp(0.75rem, 1.4vw, 1.5rem); display: flex; flex-direction: column; gap: var(--s-1); }
-  .sw__row b { font-family: var(--display); font-weight: 760; font-size: clamp(1rem, 1.9vw, 1.75rem); font-stretch: 110%; }
-  .sw__row span { font-size: var(--t-small); font-weight: 520; }
+  .sw__head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap); align-items: end; margin-bottom: var(--s-6); }
+  .sw__piece { max-width: 28rem; justify-self: end; width: 100%; }
+  .sw__row { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--s-2); margin-inline: var(--margin); }
+  .sw__row li { aspect-ratio: 3 / 4; padding: var(--s-3); display: flex; flex-direction: column; justify-content: flex-end; gap: 0; font-size: var(--t-small); }
+  .sw__row b { font-weight: 560; }
 
-  /* Sangre */
-  .blk--bleed { padding-block: 0 var(--s-5); }
-  .blk--bleed :global(.bleed__fig .fig__media) { aspect-ratio: auto; height: min(92svh, 62rem); }
-  .blk--bleed .cap { margin-top: var(--s-3); }
+  /* Imagen grande */
+  .blk--bleed :global(.bleed__fig .fig__media) { aspect-ratio: auto; height: min(84svh, 58rem); }
 
   .piece { max-width: 72rem; margin-inline: auto; }
 
   /* Fila justificada: misma altura, anchos según proporción. En móvil, carrusel horizontal. */
-  .jrow { display: flex; gap: 24px; align-items: flex-start; max-width: var(--rowmax); }
+  .jrow { display: flex; gap: var(--gap); align-items: flex-start; max-width: var(--rowmax); }
   .jrow__item { flex: var(--ir) 1 0%; min-width: 0; }
   .jrow__item :global(.cap) { min-width: 7.5rem; }
   .jrow:focus-visible { outline-offset: 6px; }
 
-  .grid { display: grid; gap: clamp(1.5rem, 3vw, 3rem) var(--gap); align-items: end; }
+  .grid { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem) var(--gap); align-items: end; }
   .grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
   .stack { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); }
 
   /* Secuencia de proceso */
-  .seq { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); counter-reset: s; }
-  .seq__media { aspect-ratio: 4 / 5; background: color-mix(in srgb, var(--fg) 6%, var(--bg)); padding: clamp(0.75rem, 2vw, 1.5rem); display: grid; }
+  .seq { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .seq__media { aspect-ratio: 4 / 5; background: var(--plate); padding: clamp(0.75rem, 2vw, 1.5rem); display: grid; }
   .seq__media :global(.fig), .seq__media :global(.fig__media) { height: 100%; width: 100%; aspect-ratio: auto; }
-  .seq__media :global(.fig--cover) { margin: calc(clamp(0.75rem, 2vw, 1.5rem) * -1); height: calc(100% + 2 * clamp(0.75rem, 2vw, 1.5rem)); width: calc(100% + 2 * clamp(0.75rem, 2vw, 1.5rem)); }
-  .seq__n { font-size: clamp(3rem, 6vw, 5.5rem); --stretch: 60%; margin-top: var(--s-4); line-height: 0.9; }
-  .seq__step .h3 { margin-top: var(--s-2); }
-  .seq__t { margin-top: var(--s-2); max-width: 32ch; color: var(--fg-2); }
+  .seq__media:has(:global(.fig--cover)) { padding: 0; }
+  .seq__n { margin-top: var(--s-4); font-size: var(--t-small); color: var(--fg-2); font-variant-numeric: tabular-nums; }
+  .seq__step .h3 { margin-top: var(--s-1); }
+  .seq__t { margin-top: var(--s-1); max-width: 32ch; color: var(--fg-2); }
 
   /* Frase */
-  .stm { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: var(--gap) calc(var(--gap) * 2); align-items: end; }
-  .stm__q { font-size: clamp(2.5rem, 6.6vw, 7rem); --stretch: 88%; line-height: 0.92; text-wrap: balance; }
-  .stm__note { margin-top: var(--s-6); font-size: var(--t-lead); line-height: 1.4; }
-  .stm__pieces { display: grid; gap: var(--gap); max-width: 22rem; justify-self: end; width: 100%; }
+  .stm { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-6) var(--gap); align-items: end; }
+  .stm__q { font-size: clamp(2rem, 1.4rem + 2.4vw, 3.5rem); line-height: 1.08; max-width: 22ch; }
+  .stm__note { margin-top: var(--s-5); color: var(--fg-2); }
+  .stm__pieces { display: grid; gap: var(--gap); max-width: 20rem; justify-self: end; width: 100%; }
 
   /* Anatomía y marcadores */
-  .anat { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--s-7) calc(var(--gap) * 3); align-items: center; }
+  .anat { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--s-7) calc(var(--gap) * 2); align-items: center; }
   .anat--photo { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
   .anat__fig { position: relative; }
-  .anat__zone { position: absolute; border: 3px solid #ffd400; }
+  .anat__zone { position: absolute; border: 2px solid var(--ink); box-shadow: 0 0 0 1px #fff, inset 0 0 0 1px #fff; }
   .anat__zone i, .anat__dot, .anat__legend i {
-    display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%;
-    background: #ffd400; color: #101010; font: 700 1rem/1 var(--text); font-style: normal;
+    display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%;
+    background: var(--ink); color: #fff; font: 560 0.8125rem/1 var(--text); font-style: normal;
   }
-  .anat__zone i { position: absolute; top: -1.2rem; right: -1.2rem; }
-  .anat__dot { position: absolute; transform: translate(-50%, -50%); box-shadow: 0 0 0 4px rgb(16 16 16 / 0.35); }
+  .anat__zone i { position: absolute; top: -0.9rem; right: -0.9rem; }
+  .anat__dot { position: absolute; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px #fff; }
   .anat__legend ol { display: grid; gap: var(--s-5); }
-  .anat__legend li { display: grid; grid-template-columns: 2.25rem 1fr; gap: var(--s-4); align-items: start; }
+  .anat__legend li { display: grid; grid-template-columns: 1.75rem 1fr; gap: var(--s-4); align-items: start; }
   .anat__legend p { margin-top: var(--s-1); color: var(--fg-2); }
 
   /* Par */
-  .pair { display: grid; gap: var(--s-6); }
-  .pair__text { font-size: var(--t-lead); line-height: 1.4; max-width: 40ch; }
+  .pair { display: grid; gap: var(--s-5); }
+  .pair__text { max-width: 52ch; color: var(--fg-2); }
 
   @media (max-width: 1099px) {
     .notes, .stm, .anat, .anat--photo, .sw__head { grid-template-columns: 1fr; }
     .sw__piece { justify-self: start; }
     .sw__row { grid-template-columns: repeat(3, 1fr); }
-    .sw__row li { min-height: 9rem; }
     .grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .anat__fig { max-width: 34rem; }
   }
@@ -294,9 +290,8 @@ const sizesFor = (share: number) => `(min-width: 1100px) ${Math.max(18, Math.rou
     .seq { grid-template-columns: 1fr; gap: var(--s-7); }
     .grid--2, .grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5) var(--s-3); }
     .sw__row { grid-template-columns: repeat(2, 1fr); }
-    /* Carrusel con scroll nativo y la siguiente pieza asomando. */
     .jrow {
-      max-width: none; gap: 16px; overflow-x: auto; scroll-snap-type: x proximity;
+      max-width: none; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity;
       margin-inline: calc(var(--margin) * -1); padding-inline: var(--margin); scroll-padding-inline: var(--margin);
       scrollbar-width: none;
     }

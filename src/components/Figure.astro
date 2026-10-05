@@ -73,13 +73,15 @@ const pos = piece.focus ?? '50% 50%';
   .fig__el, .fig__media :global(img) { width: 100%; height: 100%; object-fit: contain; }
   .fig--cover .fig__media :global(img), .fig--cover .fig__el { object-fit: cover; }
   .fig--round .fig__media { border-radius: 50%; overflow: hidden; }
+  /* Filete muy suave: separa las piezas claras del fondo blanco sin enmarcarlas. */
+  .fig:not(.fig--round):not(.fig--cover) .fig__media::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgb(28 28 26 / 0.07); pointer-events: none; }
   .fig__toggle {
     position: absolute; right: var(--s-3); bottom: var(--s-3);
     width: 2.75rem; height: 2.75rem; display: grid; place-items: center;
-    background: rgb(16 16 16 / 0.72); color: #fff; border-radius: 50%;
+    background: rgb(28 28 26 / 0.72); color: #fff; border-radius: 50%;
     transition: background-color 160ms ease;
   }
-  .fig__toggle:hover { background: rgb(16 16 16 / 0.9); }
+  .fig__toggle:hover { background: rgb(28 28 26 / 0.9); }
   .fig__toggle svg { fill: currentColor; }
   .fig__toggle .i-play { display: none; }
   .fig__toggle[aria-pressed='true'] .i-pause { display: none; }
